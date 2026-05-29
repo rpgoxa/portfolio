@@ -50,10 +50,36 @@ export default function SolarSystemPortfolio() {
     ))
   }, [hasScrolled])
 
+  const touchStartY = useRef(0)
+  const touchLastY = useRef(0)
+
+  const handleTouchStart = useCallback((e: TouchEvent) => {
+    touchStartY.current = e.touches[0].clientY
+    touchLastY.current = e.touches[0].clientY
+  }, [])
+
+  const handleTouchMove = useCallback((e: TouchEvent) => {
+    e.preventDefault()
+    if (!hasScrolled) setHasScrolled(true)
+    const currentY = e.touches[0].clientY
+    const delta = touchLastY.current - currentY
+    touchLastY.current = currentY
+    const normalized = Math.sign(delta) * Math.min(Math.abs(delta), 30)
+    targetRef.current = Math.max(0, Math.min(1,
+      targetRef.current + normalized * 0.003
+    ))
+  }, [hasScrolled])
+
   useEffect(() => {
     window.addEventListener('wheel', handleWheel, { passive: false, capture: true })
-    return () => window.removeEventListener('wheel', handleWheel, { capture: true })
-  }, [handleWheel])
+    window.addEventListener('touchstart', handleTouchStart, { passive: false })
+    window.addEventListener('touchmove', handleTouchMove, { passive: false })
+    return () => {
+      window.removeEventListener('wheel', handleWheel, { capture: true })
+      window.removeEventListener('touchstart', handleTouchStart)
+      window.removeEventListener('touchmove', handleTouchMove)
+    }
+  }, [handleWheel, handleTouchStart, handleTouchMove])
 
   useEffect(() => {
     let rafId: number
