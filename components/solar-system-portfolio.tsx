@@ -10,7 +10,6 @@ import { PlanetLabel } from '@/components/ui/planet-label'
 import { planets } from '@/lib/planet-data'
 import { User } from 'lucide-react'
 
-// Dynamically import the 3D canvas to avoid SSR issues
 const SolarSystemCanvas = dynamic(
   () => import('@/components/solar-system/solar-system-canvas').then(mod => mod.SolarSystemCanvas),
   { 
@@ -34,10 +33,8 @@ export default function SolarSystemPortfolio() {
   const scrollRef = useRef(0)
   const targetRef = useRef(0)
 
-  // Calculate hero visibility (visible when scroll is near 0)
   const showHero = scrollProgress < 0.08
 
-  // Calculate which section/planet based on scroll
   const currentSection = Math.floor(scrollProgress * 7)
   const currentPlanetIndex = currentSection >= 1 && currentSection <= 6 ? currentSection - 1 : null
 
@@ -50,11 +47,9 @@ export default function SolarSystemPortfolio() {
     ))
   }, [hasScrolled])
 
-  const touchStartY = useRef(0)
   const touchLastY = useRef(0)
 
   const handleTouchStart = useCallback((e: TouchEvent) => {
-    touchStartY.current = e.touches[0].clientY
     touchLastY.current = e.touches[0].clientY
   }, [])
 
@@ -66,18 +61,18 @@ export default function SolarSystemPortfolio() {
     touchLastY.current = currentY
     const normalized = Math.sign(delta) * Math.min(Math.abs(delta), 30)
     targetRef.current = Math.max(0, Math.min(1,
-      targetRef.current + normalized * 0.003
+      targetRef.current + normalized * 0.0012
     ))
   }, [hasScrolled])
 
   useEffect(() => {
     window.addEventListener('wheel', handleWheel, { passive: false, capture: true })
-    window.addEventListener('touchstart', handleTouchStart, { passive: false })
-    window.addEventListener('touchmove', handleTouchMove, { passive: false })
+    window.addEventListener('touchstart', handleTouchStart, { passive: false, capture: true })
+    window.addEventListener('touchmove', handleTouchMove, { passive: false, capture: true })
     return () => {
       window.removeEventListener('wheel', handleWheel, { capture: true })
-      window.removeEventListener('touchstart', handleTouchStart)
-      window.removeEventListener('touchmove', handleTouchMove)
+      window.removeEventListener('touchstart', handleTouchStart, { capture: true })
+      window.removeEventListener('touchmove', handleTouchMove, { capture: true })
     }
   }, [handleWheel, handleTouchStart, handleTouchMove])
 
@@ -94,14 +89,12 @@ export default function SolarSystemPortfolio() {
     rafId = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(rafId)
   }, [])
-  
-  // Handle planet click - open project panel
+
   const handlePlanetClick = useCallback((index: number | null) => {
     setActivePlanetIndex(index)
     setShowProjectPanel(true)
   }, [])
-  
-  // Handle keyboard navigation
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -109,74 +102,65 @@ export default function SolarSystemPortfolio() {
         setShowAboutPanel(false)
       }
     }
-    
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
-  
-  // Auto-select planet based on scroll position
+
   useEffect(() => {
     if (!showProjectPanel && currentPlanetIndex !== null) {
       setActivePlanetIndex(currentPlanetIndex)
     }
   }, [currentPlanetIndex, showProjectPanel])
-  
+
   return (
     <div ref={containerRef} style={{ height: '100vh', overflow: 'hidden' }}>
-        {/* Fixed 3D canvas */}
-        <div className="fixed inset-0 z-0" style={{ pointerEvents: 'auto' }}>
-          <SolarSystemCanvas
-            scrollProgress={scrollProgress}
-            activePlanetIndex={activePlanetIndex}
-            setActivePlanetIndex={handlePlanetClick}
-            hoveredPlanet={hoveredPlanet}
-            setHoveredPlanet={setHoveredPlanet}
-          />
-        </div>
-        
-        {/* Hero section - fades on scroll */}
-        <HeroSection isVisible={showHero} />
-        
-        {/* Planet label - shows when focused on a planet */}
-        <PlanetLabel 
-          currentPlanetIndex={currentPlanetIndex} 
+      <div className="fixed inset-0 z-0" style={{ pointerEvents: 'auto' }}>
+        <SolarSystemCanvas
           scrollProgress={scrollProgress}
-          onOpenPanel={() => {
-            if (currentPlanetIndex !== null) {
-              setActivePlanetIndex(currentPlanetIndex)
-              setShowProjectPanel(true)
-            }
-          }}
+          activePlanetIndex={activePlanetIndex}
+          setActivePlanetIndex={handlePlanetClick}
+          hoveredPlanet={hoveredPlanet}
+          setHoveredPlanet={setHoveredPlanet}
         />
-        
-        {/* HUD elements */}
-        <HUD 
-          scrollProgress={scrollProgress}
-          currentPlanetIndex={currentPlanetIndex}
-          showScrollHint={scrollProgress > 0.05 && scrollProgress < 0.9}
-        />
-        
-        {/* About button */}
-        <button
-          onClick={() => setShowAboutPanel(true)}
-          className="fixed bottom-6 left-6 z-40 p-3 rounded-full glass hover:bg-white/10 transition-all hover:scale-110"
-          aria-label="About"
-        >
-          <User className="w-5 h-5 text-white/70" />
-        </button>
-        
-        {/* Project panel */}
-        <ProjectPanel
-          planet={activePlanetIndex !== null ? planets[activePlanetIndex] : null}
-          isOpen={showProjectPanel}
-          onClose={() => setShowProjectPanel(false)}
-        />
-        
-        {/* About panel */}
-        <AboutPanel
-          isOpen={showAboutPanel}
-          onClose={() => setShowAboutPanel(false)}
-        />
+      </div>
+
+      <HeroSection isVisible={showHero} />
+
+      <PlanetLabel
+        currentPlanetIndex={currentPlanetIndex}
+        scrollProgress={scrollProgress}
+        onOpenPanel={() => {
+          if (currentPlanetIndex !== null) {
+            setActivePlanetIndex(currentPlanetIndex)
+            setShowProjectPanel(true)
+          }
+        }}
+      />
+
+      <HUD
+        scrollProgress={scrollProgress}
+        currentPlanetIndex={currentPlanetIndex}
+        showScrollHint={scrollProgress > 0.05 && scrollProgress < 0.9}
+      />
+
+      <button
+        onClick={() => setShowAboutPanel(true)}
+        className="fixed bottom-6 left-6 z-40 p-3 rounded-full glass hover:bg-white/10 transition-all hover:scale-110"
+        aria-label="About"
+      >
+        <User className="w-5 h-5 text-white/70" />
+      </button>
+
+      <ProjectPanel
+        planet={activePlanetIndex !== null ? planets[activePlanetIndex] : null}
+        isOpen={showProjectPanel}
+        onClose={() => setShowProjectPanel(false)}
+      />
+
+      <AboutPanel
+        isOpen={showAboutPanel}
+        onClose={() => setShowAboutPanel(false)}
+      />
     </div>
   )
 }

@@ -21,13 +21,13 @@ interface SceneProps {
 // Camera positions for each section - designed to get close to each planet
 const cameraPositions = [
   { pos: [80, 25, 80], lookAt: [20, 0, 0] },      // Overview - see full system
-  { pos: [14, 1.5, 4], lookAt: [12, 0, 0] },     // VitaAI (Earth) - close up
-  { pos: [20, 1.2, 4], lookAt: [18, 0, 0] },     // Eye (Exoplanet) - close up
-  { pos: [26, 1.5, 4], lookAt: [24, 0, 0] },     // Circuit (Mars) - close up
-  { pos: [36, 3, 8], lookAt: [32, 0, 0] },       // Automata (Jupiter) - close up (bigger planet)
-  { pos: [43, 2, 5], lookAt: [40, 0, 0] },       // Abyss (Neptune) - close up
-  { pos: [54, 3, 8], lookAt: [50, 0, 0] },       // Play (Saturn) - close up (rings visible)
-  { pos: [100, 35, 100], lookAt: [25, 0, 0] },   // Final overview - pull back
+  { pos: [14, 3, 10], lookAt: [12, 0, 0] },       // VitaAI - further back
+  { pos: [20, 3, 10], lookAt: [18, 0, 0] },       // Eye - further back
+  { pos: [26, 3, 10], lookAt: [24, 0, 0] },       // Circuit - further back
+  { pos: [36, 5, 14], lookAt: [32, 0, 0] },       // Automata - further back
+  { pos: [43, 4, 12], lookAt: [40, 0, 0] },       // Abyss - further back
+  { pos: [54, 5, 14], lookAt: [50, 0, 0] },       // Play - further back
+  { pos: [100, 35, 100], lookAt: [25, 0, 0] },    // Final overview
 ]
 
 function CameraController({ scrollProgress, activePlanetIndex }: { scrollProgress: number, activePlanetIndex: number | null }) {
