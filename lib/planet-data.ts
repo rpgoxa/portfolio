@@ -122,17 +122,15 @@ export const planets: Planet[] = [
 ]
 
 export const aboutData = {
-  bio: "I'm a 17-year-old self-taught developer and systems enthusiast based in Lebanon. I don't just build applications — I understand, break down, and secure technology at every layer.",
+  bio: "I am a 17-year-old full-stack developer and systems enthusiast from Lebanon, breaking down and building technology from responsive user interfaces down to low-level binaries and custom circuits.",
   disciplines: [
     'Full-Stack Web, Cross-Platform Mobile, Automated Workflows',
     'Reverse Engineering, Game Modding, Electrical Engineering',
     'Offensive & Defensive Cybersecurity (actively building)'
   ],
   techStack: {
-    languages: ['Python', 'JavaScript', 'TypeScript', 'Dart', 'Bash', 'C++'],
-    frontend: ['Next.js', 'React', 'Flutter', 'Tailwind CSS'],
-    backend: ['FastAPI', 'RESTful APIs', 'Node.js'],
-    systems: ['Linux (Arch/Garuda)', 'ADB', 'Termux', 'Binary Analysis']
+    languages: ['Python', 'JavaScript', 'TypeScript', 'Dart', 'Bash', 'C++', 'C', 'SQL', 'HTML/CSS'],
+    systems: ['Linux (Arch/Garuda)', 'Ubuntu', 'Kali Linux', 'ADB', 'Termux', 'Binary Analysis', 'Git']
   },
   social: {
     github: 'https://github.com/rpgoxa',

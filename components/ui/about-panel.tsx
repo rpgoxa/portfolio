@@ -37,10 +37,8 @@ export function AboutPanel({ isOpen, onClose }: AboutPanelProps) {
                 {page === 1 && (
                   <motion.div key="tech" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
                     <h3 className="text-sm font-mono uppercase tracking-widest text-primary mb-6 flex items-center gap-2"><Cpu className="w-4 h-4" />Tech Stack</h3>
-                    <div className="grid sm:grid-cols-2 gap-6">
+                    <div className="grid gap-6">
                       <div><p className="text-xs font-mono text-white/50 mb-2 uppercase">Languages</p><div className="flex flex-wrap gap-2">{aboutData.techStack.languages.map((t) => (<span key={t} className="px-3 py-1 rounded-full text-sm bg-blue-500/20 text-blue-300 border border-blue-500/30">{t}</span>))}</div></div>
-                      <div><p className="text-xs font-mono text-white/50 mb-2 uppercase">Frontend</p><div className="flex flex-wrap gap-2">{aboutData.techStack.frontend.map((t) => (<span key={t} className="px-3 py-1 rounded-full text-sm bg-green-500/20 text-green-300 border border-green-500/30">{t}</span>))}</div></div>
-                      <div><p className="text-xs font-mono text-white/50 mb-2 uppercase">Backend</p><div className="flex flex-wrap gap-2">{aboutData.techStack.backend.map((t) => (<span key={t} className="px-3 py-1 rounded-full text-sm bg-purple-500/20 text-purple-300 border border-purple-500/30">{t}</span>))}</div></div>
                       <div><p className="text-xs font-mono text-white/50 mb-2 uppercase">Systems</p><div className="flex flex-wrap gap-2">{aboutData.techStack.systems.map((t) => (<span key={t} className="px-3 py-1 rounded-full text-sm bg-orange-500/20 text-orange-300 border border-orange-500/30">{t}</span>))}</div></div>
                     </div>
                   </motion.div>
