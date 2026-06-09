@@ -1,12 +1,34 @@
 'use client'
 
-import { useRef, useMemo } from 'react'
+import { useRef, useMemo, useEffect } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
+import { nebulaVertexShader, nebulaFragmentShader } from './nebula-shader'
+
+const NEBULA_RADIUS = 200
 
 export function Starfield() {
   const starsRef = useRef<THREE.Points>(null)
   const dustRef = useRef<THREE.Points>(null)
+
+  // Subtle background nebula — large BackSide sphere, drifting fBm clouds.
+  const nebulaMaterial = useMemo(
+    () =>
+      new THREE.ShaderMaterial({
+        uniforms: {
+          uTime: { value: 0 },
+          uOpacity: { value: 0.15 },
+        },
+        vertexShader: nebulaVertexShader,
+        fragmentShader: nebulaFragmentShader,
+        transparent: true,
+        side: THREE.BackSide,
+        depthWrite: false,
+      }),
+    []
+  )
+
+  useEffect(() => () => nebulaMaterial.dispose(), [nebulaMaterial])
   
   const [starPositions, starColors] = useMemo(() => {
     const positions = new Float32Array(2000 * 3)
@@ -64,7 +86,9 @@ export function Starfield() {
   
   useFrame((state) => {
     const time = state.clock.getElapsedTime()
-    
+
+    nebulaMaterial.uniforms.uTime.value = time
+
     if (starsRef.current) {
       starsRef.current.rotation.y = time * 0.002
       starsRef.current.rotation.x = Math.sin(time * 0.001) * 0.02
@@ -77,6 +101,12 @@ export function Starfield() {
   
   return (
     <group>
+      {/* Background nebula — sits behind everything */}
+      <mesh renderOrder={-10}>
+        <sphereGeometry args={[NEBULA_RADIUS, 16, 16]} />
+        <primitive object={nebulaMaterial} attach="material" />
+      </mesh>
+
       {/* Main starfield */}
       <points ref={starsRef}>
         <bufferGeometry>
