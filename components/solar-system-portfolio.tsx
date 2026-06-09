@@ -52,7 +52,7 @@ export default function SolarSystemPortfolio() {
     lockRef.current = true
     if (!hasScrolled) setHasScrolled(true)
     // Unlock after the camera settles
-    setTimeout(() => { lockRef.current = false }, 700)
+    setTimeout(() => { lockRef.current = false }, 1200)
   }, [hasScrolled])
 
   const handleWheel = useCallback((e: WheelEvent) => {
@@ -72,7 +72,7 @@ export default function SolarSystemPortfolio() {
     const delta = touchStartY.current - currentY
     touchAccum.current = delta
     // Trigger a stop change once swipe passes threshold
-    if (Math.abs(touchAccum.current) > 60) {
+    if (Math.abs(touchAccum.current) > 120) {
       goToStop(touchAccum.current > 0 ? 1 : -1)
       touchStartY.current = currentY
       touchAccum.current = 0
@@ -97,7 +97,7 @@ export default function SolarSystemPortfolio() {
       const target = stopRef.current / (TOTAL_STOPS - 1)
       const diff = target - scrollRef.current
       if (Math.abs(diff) > 0.00001) {
-        scrollRef.current += diff * 0.08
+        scrollRef.current += diff * 0.04
         setScrollProgress(Math.round(scrollRef.current * 10000) / 10000)
       }
       rafId = requestAnimationFrame(tick)
