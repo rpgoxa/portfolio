@@ -81,12 +81,19 @@ function Scene({ scrollProgress, activePlanetIndex, setActivePlanetIndex, hovere
       <CameraController scrollProgress={scrollProgress} activePlanetIndex={activePlanetIndex} />
       
       {/* Ambient light for base illumination */}
-      <ambientLight intensity={isMobile ? 0.45 : 0.1} />
+      <ambientLight intensity={isMobile ? 0.8 : 0.1} />
       {isMobile && (
         <directionalLight
           position={[10, 10, 10]}
-          intensity={0.4}
+          intensity={0.7}
           color="#ffffff"
+        />
+      )}
+      {isMobile && (
+        <directionalLight
+          position={[-10, 5, -10]}
+          intensity={0.5}
+          color="#ffeedd"
         />
       )}
       
