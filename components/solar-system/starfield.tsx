@@ -7,9 +7,14 @@ import { nebulaVertexShader, nebulaFragmentShader } from './nebula-shader'
 
 const NEBULA_RADIUS = 200
 
-export function Starfield() {
+interface StarfieldProps {
+  isMobile?: boolean
+}
+
+export function Starfield({ isMobile = false }: StarfieldProps) {
   const starsRef = useRef<THREE.Points>(null)
   const dustRef = useRef<THREE.Points>(null)
+  const starCount = isMobile ? 1000 : 2000
 
   // Subtle background nebula — large BackSide sphere, drifting fBm clouds.
   const nebulaMaterial = useMemo(
@@ -31,10 +36,10 @@ export function Starfield() {
   useEffect(() => () => nebulaMaterial.dispose(), [nebulaMaterial])
   
   const [starPositions, starColors] = useMemo(() => {
-    const positions = new Float32Array(2000 * 3)
-    const colors = new Float32Array(2000 * 3)
-    
-    for (let i = 0; i < 2000; i++) {
+    const positions = new Float32Array(starCount * 3)
+    const colors = new Float32Array(starCount * 3)
+
+    for (let i = 0; i < starCount; i++) {
       const i3 = i * 3
       // Distribute stars in a sphere around the scene
       const radius = 200 + Math.random() * 400
@@ -66,7 +71,7 @@ export function Starfield() {
     }
     
     return [positions, colors]
-  }, [])
+  }, [starCount])
   
   const [dustPositions, dustSizes] = useMemo(() => {
     const positions = new Float32Array(500 * 3)
@@ -87,7 +92,9 @@ export function Starfield() {
   useFrame((state) => {
     const time = state.clock.getElapsedTime()
 
-    nebulaMaterial.uniforms.uTime.value = time
+    if (!isMobile) {
+      nebulaMaterial.uniforms.uTime.value = time
+    }
 
     if (starsRef.current) {
       starsRef.current.rotation.y = time * 0.002
@@ -101,11 +108,13 @@ export function Starfield() {
   
   return (
     <group>
-      {/* Background nebula — sits behind everything */}
-      <mesh renderOrder={-10}>
-        <sphereGeometry args={[NEBULA_RADIUS, 16, 16]} />
-        <primitive object={nebulaMaterial} attach="material" />
-      </mesh>
+      {/* Background nebula — sits behind everything (skipped on mobile) */}
+      {!isMobile && (
+        <mesh renderOrder={-10}>
+          <sphereGeometry args={[NEBULA_RADIUS, 16, 16]} />
+          <primitive object={nebulaMaterial} attach="material" />
+        </mesh>
+      )}
 
       {/* Main starfield */}
       <points ref={starsRef}>

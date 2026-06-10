@@ -9,6 +9,7 @@ import { Planet } from './planet'
 import { Starfield } from './starfield'
 import { OrbitLines } from './orbit-lines'
 import { planets } from '@/lib/planet-data'
+import { useIsMobile } from '@/hooks/use-mobile'
 
 interface SceneProps {
   scrollProgress: number
@@ -16,6 +17,7 @@ interface SceneProps {
   setActivePlanetIndex: (index: number | null) => void
   hoveredPlanet: string | null
   setHoveredPlanet: (id: string | null) => void
+  isMobile: boolean
 }
 
 // Camera positions for each section - designed to get close to each planet
@@ -73,7 +75,7 @@ function CameraController({ scrollProgress, activePlanetIndex }: { scrollProgres
   return null
 }
 
-function Scene({ scrollProgress, activePlanetIndex, setActivePlanetIndex, hoveredPlanet, setHoveredPlanet }: SceneProps) {
+function Scene({ scrollProgress, activePlanetIndex, setActivePlanetIndex, hoveredPlanet, setHoveredPlanet, isMobile }: SceneProps) {
   return (
     <>
       <CameraController scrollProgress={scrollProgress} activePlanetIndex={activePlanetIndex} />
@@ -82,7 +84,7 @@ function Scene({ scrollProgress, activePlanetIndex, setActivePlanetIndex, hovere
       <ambientLight intensity={0.1} />
       
       {/* Background and stars */}
-      <Starfield />
+      <Starfield isMobile={isMobile} />
       <OrbitLines />
       
       {/* The Sun */}
@@ -99,9 +101,9 @@ function Scene({ scrollProgress, activePlanetIndex, setActivePlanetIndex, hovere
         />
       ))}
       
-      {/* Post-processing effects */}
-      <EffectComposer>
-        <Bloom 
+      {/* Post-processing effects — disabled on mobile for performance */}
+      <EffectComposer enabled={!isMobile}>
+        <Bloom
           intensity={1.2}
           luminanceThreshold={0.2}
           luminanceSmoothing={0.9}
@@ -131,6 +133,8 @@ export function SolarSystemCanvas({
   hoveredPlanet,
   setHoveredPlanet
 }: SolarSystemCanvasProps) {
+  const isMobile = useIsMobile()
+
   return (
     <Canvas
       camera={{
@@ -139,19 +143,21 @@ export function SolarSystemCanvas({
         far: 1000,
         position: [80, 30, 80]
       }}
+      dpr={isMobile ? [1, 1] : [1, 1.5]}
       gl={{
-        antialias: true,
+        antialias: !isMobile,
         alpha: false,
         powerPreference: 'high-performance'
       }}
       style={{ background: '#000005' }}
     >
-      <Scene 
+      <Scene
         scrollProgress={scrollProgress}
         activePlanetIndex={activePlanetIndex}
         setActivePlanetIndex={setActivePlanetIndex}
         hoveredPlanet={hoveredPlanet}
         setHoveredPlanet={setHoveredPlanet}
+        isMobile={isMobile}
       />
     </Canvas>
   )
