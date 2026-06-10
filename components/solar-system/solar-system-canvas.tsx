@@ -81,7 +81,14 @@ function Scene({ scrollProgress, activePlanetIndex, setActivePlanetIndex, hovere
       <CameraController scrollProgress={scrollProgress} activePlanetIndex={activePlanetIndex} />
       
       {/* Ambient light for base illumination */}
-      <ambientLight intensity={0.1} />
+      <ambientLight intensity={isMobile ? 0.45 : 0.1} />
+      {isMobile && (
+        <directionalLight
+          position={[10, 10, 10]}
+          intensity={0.4}
+          color="#ffffff"
+        />
+      )}
       
       {/* Background and stars */}
       <Starfield isMobile={isMobile} />
