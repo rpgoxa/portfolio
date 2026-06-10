@@ -32,22 +32,36 @@ const cameraPositions = [
   { pos: [100, 35, 100], lookAt: [25, 0, 0] },   // Final overview - pull back
 ]
 
-function CameraController({ scrollProgress, activePlanetIndex }: { scrollProgress: number, activePlanetIndex: number | null }) {
+// Mobile camera positions — closer framing for smaller screens
+const mobileCameraPositions = [
+  { pos: [50, 15, 50], lookAt: [20, 0, 0] },
+  { pos: [14, 1.5, 6], lookAt: [12, 0, 0] },
+  { pos: [20, 1.2, 6], lookAt: [18, 0, 0] },
+  { pos: [26, 1.5, 6], lookAt: [24, 0, 0] },
+  { pos: [36, 3, 10], lookAt: [32, 0, 0] },
+  { pos: [43, 2, 8], lookAt: [40, 0, 0] },
+  { pos: [54, 3, 10], lookAt: [50, 0, 0] },
+  { pos: [70, 20, 70], lookAt: [25, 0, 0] },
+]
+
+function CameraController({ scrollProgress, activePlanetIndex, isMobile }: { scrollProgress: number, activePlanetIndex: number | null, isMobile: boolean }) {
   const { camera } = useThree()
   const targetPosition = useRef(new THREE.Vector3(80, 30, 80))
   const targetLookAt = useRef(new THREE.Vector3(20, 0, 0))
   const currentLookAt = useRef(new THREE.Vector3(20, 0, 0))
-  
+
   useFrame(() => {
+    const positions = isMobile ? mobileCameraPositions : cameraPositions
+
     // Calculate which section we're in
-    const totalSections = cameraPositions.length - 1
+    const totalSections = positions.length - 1
     const sectionProgress = scrollProgress * totalSections
     const currentSection = Math.floor(sectionProgress)
     const sectionT = sectionProgress - currentSection
-    
+
     // Get current and next positions
-    const currentPos = cameraPositions[Math.min(currentSection, totalSections)]
-    const nextPos = cameraPositions[Math.min(currentSection + 1, totalSections)]
+    const currentPos = positions[Math.min(currentSection, totalSections)]
+    const nextPos = positions[Math.min(currentSection + 1, totalSections)]
     
     // Smooth interpolation with easing
     const easeT = sectionT < 0.5 
@@ -78,24 +92,10 @@ function CameraController({ scrollProgress, activePlanetIndex }: { scrollProgres
 function Scene({ scrollProgress, activePlanetIndex, setActivePlanetIndex, hoveredPlanet, setHoveredPlanet, isMobile }: SceneProps) {
   return (
     <>
-      <CameraController scrollProgress={scrollProgress} activePlanetIndex={activePlanetIndex} />
+      <CameraController scrollProgress={scrollProgress} activePlanetIndex={activePlanetIndex} isMobile={isMobile} />
       
       {/* Ambient light for base illumination */}
-      <ambientLight intensity={isMobile ? 0.8 : 0.1} />
-      {isMobile && (
-        <directionalLight
-          position={[10, 10, 10]}
-          intensity={0.7}
-          color="#ffffff"
-        />
-      )}
-      {isMobile && (
-        <directionalLight
-          position={[-10, 5, -10]}
-          intensity={0.5}
-          color="#ffeedd"
-        />
-      )}
+      <ambientLight intensity={isMobile ? 0.3 : 0.1} />
       
       {/* Background and stars */}
       <Starfield isMobile={isMobile} />
@@ -115,18 +115,15 @@ function Scene({ scrollProgress, activePlanetIndex, setActivePlanetIndex, hovere
         />
       ))}
       
-      {/* Post-processing effects — disabled on mobile for performance */}
-      <EffectComposer enabled={!isMobile}>
+      {/* Post-processing effects — lighter bloom on mobile */}
+      <EffectComposer>
         <Bloom
-          intensity={1.2}
-          luminanceThreshold={0.2}
+          intensity={isMobile ? 0.6 : 1.2}
+          luminanceThreshold={isMobile ? 0.5 : 0.2}
           luminanceSmoothing={0.9}
-          radius={0.8}
+          radius={isMobile ? 0.4 : 0.8}
         />
-        <Vignette 
-          offset={0.3}
-          darkness={0.7}
-        />
+        {!isMobile ? <Vignette offset={0.3} darkness={0.7} /> : <></>}
       </EffectComposer>
     </>
   )
